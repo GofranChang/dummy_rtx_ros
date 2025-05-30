@@ -4,7 +4,7 @@
   <name>dummy_rtx_moveit_config</name>
   <version>0.3.0</version>
   <description>
-     An automatically generated package with all the configuration and launch files for using the dummy_ros_r with the MoveIt Motion Planning Framework
+     An automatically generated package with all the configuration and launch files for using the dummy_rtx with the MoveIt Motion Planning Framework
   </description>
   <maintainer email="zhanggaofan0827@gmail.com">GofranChang</maintainer>
 

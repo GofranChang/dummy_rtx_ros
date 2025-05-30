@@ -1,9 +1,9 @@
 <?xml version="1.0" ?>
-<robot name="dummy_ros_r" xmlns:xacro="http://www.ros.org/wiki/xacro">
+<robot name="dummy_rtx" xmlns:xacro="http://www.ros.org/wiki/xacro">
 
 <xacro:include filename="$(find dummy_rtx_description)/urdf/materials.xacro" />
-<xacro:include filename="$(find dummy_rtx_description)/urdf/dummy_ros_r.trans" />
-<xacro:include filename="$(find dummy_rtx_description)/urdf/dummy_ros_r.gazebo" />
+<xacro:include filename="$(find dummy_rtx_description)/urdf/dummy_rtx.trans" />
+<xacro:include filename="$(find dummy_rtx_description)/urdf/dummy_rtx.gazebo" />
 <link name="base_link">
   <inertial>
     <origin xyz="-1.6917018154750703e-07 -0.003158223450406361 0.04988890332172506" rpy="0 0 0"/>

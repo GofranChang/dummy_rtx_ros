@@ -1,4 +1,4 @@
-# Default initial positions for dummy_ros_r's ros2_control fake system
+# Default initial positions for dummy_rtx's ros2_control fake system
 
 initial_positions:
   Joint1: 0

@@ -1,9 +1,9 @@
 moveit_setup_assistant_config:
   urdf:
     package: dummy_rtx_description
-    relative_path: urdf/dummy_ros_r.xacro
+    relative_path: urdf/dummy_rtx.xacro
   srdf:
-    relative_path: config/dummy_ros_r.srdf
+    relative_path: config/dummy_rtx.srdf
   package_settings:
     author_name: GofranChang
     author_email: zhanggaofan0827@gmail.com
