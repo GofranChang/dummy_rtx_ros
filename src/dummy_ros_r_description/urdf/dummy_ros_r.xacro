@@ -1,29 +1,40 @@
 <?xml version="1.0" ?>
 <robot name="dummy_ros_r" xmlns:xacro="http://www.ros.org/wiki/xacro">
 
-<xacro:include filename="$(find dummy_ros_r_description)/urdf/materials.xacro" />
-<xacro:include filename="$(find dummy_ros_r_description)/urdf/dummy_ros_r.trans" />
-<xacro:include filename="$(find dummy_ros_r_description)/urdf/dummy_ros_r.gazebo" />
-<link name="base_link">
-  <inertial>
-    <origin xyz="-1.6917018154750703e-07 -0.003158223450406361 0.04988890332172506" rpy="0 0 0"/>
-    <mass value="1.0265532197281713"/>
-    <inertia ixx="0.002" iyy="0.002095" izz="0.001994" ixy="0.0" iyz="1.5e-05" ixz="0.0"/>
-  </inertial>
-  <visual>
+  <!-- 引入 xacro 子模块 -->
+  <xacro:include filename="$(find dummy_ros_r_description)/urdf/materials.xacro" />
+  <xacro:include filename="$(find dummy_ros_r_description)/urdf/dummy_ros_r.trans" />
+  <xacro:include filename="$(find dummy_ros_r_description)/urdf/dummy_ros_r.gazebo" />
+
+  <!-- ✅ 添加 dummy 根 link 和 fixed joint -->
+  <link name="base_dummy"/>
+  <joint name="fixed_base_to_real_base" type="fixed">
+    <parent link="base_dummy"/>
+    <child link="base_link"/>
     <origin xyz="0 0 0" rpy="0 0 0"/>
-    <geometry>
-      <mesh filename="file://$(find dummy_ros_r_description)/meshes/base_link.stl" scale="0.001 0.001 0.001"/>
-    </geometry>
-    <material name="silver"/>
-  </visual>
-  <collision>
-    <origin xyz="0 0 0" rpy="0 0 0"/>
-    <geometry>
-      <mesh filename="file://$(find dummy_ros_r_description)/meshes/base_link.stl" scale="0.001 0.001 0.001"/>
-    </geometry>
-  </collision>
-</link>
+  </joint>
+
+  <!-- ✅ 原始 base_link 开始 -->
+  <link name="base_link">
+    <inertial>
+      <origin xyz="-1.6917018154750703e-07 -0.003158223450406361 0.04988890332172506" rpy="0 0 0"/>
+      <mass value="1.0265532197281713"/>
+      <inertia ixx="0.002" iyy="0.002095" izz="0.001994" ixy="0.0" iyz="1.5e-05" ixz="0.0"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="file://$(find dummy_ros_r_description)/meshes/base_link.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+      <material name="silver"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="file://$(find dummy_ros_r_description)/meshes/base_link.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+    </collision>
+  </link>
 
 <link name="link1_1">
   <inertial>
@@ -156,7 +167,7 @@
   <parent link="base_link"/>
   <child link="link1_1"/>
   <axis xyz="0.0 0.0 -1.0"/>
-  <limit upper="2.96706" lower="-2.96706" effort="100" velocity="100"/>
+  <limit upper="2.96706" lower="-2.96706" effort="100" velocity="100" acceleration="2.0"/>
 </joint>
 
 <joint name="Joint2" type="revolute">
@@ -164,7 +175,7 @@
   <parent link="link1_1"/>
   <child link="link2_1"/>
   <axis xyz="1.0 0.0 0.0"/>
-  <limit upper="2.879793" lower="0.0" effort="100" velocity="100"/>
+  <limit upper="2.879793" lower="0.0" effort="100" velocity="100" acceleration="2.0"/>
 </joint>
 
 <joint name="Joint3" type="revolute">
@@ -172,7 +183,7 @@
   <parent link="link2_1"/>
   <child link="link3_1"/>
   <axis xyz="-1.0 -0.0 -0.0"/>
-  <limit upper="3.752458" lower="0.0" effort="100" velocity="100"/>
+  <limit upper="3.752458" lower="0.0" effort="100" velocity="100" acceleration="2.0"/>
 </joint>
 
 <joint name="Joint4" type="revolute">
@@ -180,7 +191,7 @@
   <parent link="link3_1"/>
   <child link="link4_1"/>
   <axis xyz="-0.0 0.965926 0.258819"/>
-  <limit upper="3.141593" lower="0.0" effort="100" velocity="100"/>
+  <limit upper="3.141593" lower="0.0" effort="100" velocity="100" acceleration="2.0"/>
 </joint>
 
 <joint name="Joint5" type="revolute">
@@ -188,7 +199,7 @@
   <parent link="link4_1"/>
   <child link="link5_1"/>
   <axis xyz="-1.0 0.0 -0.0"/>
-  <limit upper="2.094395" lower="-2.094395" effort="100" velocity="100"/>
+  <limit upper="2.094395" lower="-2.094395" effort="100" velocity="100" acceleration="2.0"/>
 </joint>
 
 <joint name="Joint6" type="continuous">
