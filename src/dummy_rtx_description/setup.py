@@ -2,7 +2,7 @@ from setuptools import setup
 import os
 from glob import glob
 
-package_name = 'dummy_ros_r_description'
+package_name = 'dummy_rtx_description'
 
 setup(
     name=package_name,

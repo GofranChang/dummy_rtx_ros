@@ -3,7 +3,7 @@
     <xacro:arg name="initial_positions_file" default="initial_positions.yaml" />
 
     <!-- Import dummy_ros_r urdf file -->
-    <xacro:include filename="$(find dummy_ros_r_description)/urdf/dummy_ros_r.xacro" />
+    <xacro:include filename="$(find dummy_rtx_description)/urdf/dummy_ros_r.xacro" />
 
     <!-- Import control_xacro -->
     <xacro:include filename="dummy_ros_r.ros2_control.xacro" />

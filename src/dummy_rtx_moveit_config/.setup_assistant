@@ -1,13 +1,13 @@
 moveit_setup_assistant_config:
   urdf:
-    package: dummy_ros_r_description
+    package: dummy_rtx_description
     relative_path: urdf/dummy_ros_r.xacro
   srdf:
     relative_path: config/dummy_ros_r.srdf
   package_settings:
-    author_name: zhanggaofan
+    author_name: GofranChang
     author_email: zhanggaofan0827@gmail.com
-    generated_timestamp: 1748589005
+    generated_timestamp: 1748606771
   control_xacro:
     command:
       - position
