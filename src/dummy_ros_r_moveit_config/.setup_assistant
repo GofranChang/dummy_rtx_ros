@@ -1,0 +1,25 @@
+moveit_setup_assistant_config:
+  urdf:
+    package: dummy_ros_r_description
+    relative_path: urdf/dummy_ros_r.xacro
+  srdf:
+    relative_path: config/dummy_ros_r.srdf
+  package_settings:
+    author_name: zhanggaofan
+    author_email: zhanggaofan0827@gmail.com
+    generated_timestamp: 1748587561
+  control_xacro:
+    command:
+      - position
+    state:
+      - position
+      - velocity
+  modified_urdf:
+    xacros:
+      - control_xacro
+  control_xacro:
+    command:
+      - position
+    state:
+      - position
+      - velocity
