@@ -9,9 +9,8 @@ from moveit_msgs.msg import RobotTrajectory
 from sensor_msgs.msg import JointState
 import threading
 import math
-
 import serial
-import threading
+import time
 
 class DummyCommand:
     def __init__(self):
@@ -65,6 +64,7 @@ class DummyCommand:
 class DummyHardware:
     def __init__(self, port, baudrate=115200, timeout=1):
         self.zero_joint_angle = [0, -73, 180, 0, 0, 0]
+        self.joint_dir = [1, 1, -1, -1, 1, 1]
 
         self.serial = serial.Serial(port, baudrate, timeout=timeout)
         self.lock = threading.Lock()  # 保证多线程/模块调用时串口操作安全
@@ -73,6 +73,8 @@ class DummyHardware:
         self.command_helper = DummyCommand()
 
         self.send_command(self.command_helper.start())
+        # time.sleep(3)
+        # self.send_command(self.command_helper.home())
 
     def send_command(self, command: str) -> str:
         if not command.endswith('\r\n'):
@@ -84,6 +86,8 @@ class DummyHardware:
             response = self.serial.readline().decode(errors='ignore').strip()
             return response
 
+        return ''
+
     def close():
         self.serial.close()
 
@@ -91,7 +95,8 @@ class DummyHardware:
         degree_location = [0.0] * 6
 
         for i in range (0, 6):
-            degree_location[i] = math.degrees(radian_location[i]) + self.zero_joint_angle[i]
+            # degree_location[i] = math.degrees(radian_location[i]) + (self.joint_dir[i] * self.zero_joint_angle[i])
+            degree_location[i] = self.zero_joint_angle[i] + (self.joint_dir[i] * math.degrees(radian_location[i]))
 
         cmd = self.command_helper.move_j(degree_location[0], 
                                          degree_location[1], 
@@ -102,7 +107,8 @@ class DummyHardware:
                                          100
                                          )
         print(f'>>> {cmd}')
-        self.send_command(cmd)
+        ack = self.send_command(cmd)
+        print(f'<<< {ack}')
 
 
 class HardwareBridge(Node):
