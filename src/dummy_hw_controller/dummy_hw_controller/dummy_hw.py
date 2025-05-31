@@ -11,6 +11,7 @@ import threading
 import math
 import serial
 import time
+import queue
 
 class DummyCommand:
     def __init__(self):
@@ -62,54 +63,75 @@ class DummyCommand:
         return f'#CMDMODE {mode}'
 
 class DummyHardware:
-    def __init__(self, port, baudrate=115200, timeout=1):
+    def __init__(self, port, baudrate=115200, timeout=10):
         self.zero_joint_angle = [0, -73, 180, 0, 0, 0]
-        self.joint_dir = [1, 1, -1, -1, 1, 1]
+        self.joint_dir = [1, 1, -1, 1, 1, 1]
 
         self.serial = serial.Serial(port, baudrate, timeout=timeout)
-        self.lock = threading.Lock()  # 保证多线程/模块调用时串口操作安全
+        self.lock = threading.Lock()
         self.serial.flushInput()
 
         self.command_helper = DummyCommand()
 
+        self.running = True
+        self.read_queue = queue.Queue()
+        self.reader_thread = threading.Thread(target=self._reader_loop, daemon=True)
+        self.reader_thread.start()
+
         self.send_command(self.command_helper.start())
-        # time.sleep(3)
+        time.sleep(1)
         # self.send_command(self.command_helper.home())
+        self.send_command(self.command_helper.set_cmd_mode(3))
+
+    def _reader_loop(self):
+        while self.running:
+            try:
+                if self.serial.in_waiting:
+                    line = self.serial.readline().decode(errors='ignore').strip()
+                    if line:
+                        self.read_queue.put(line)
+                        print(f'<<< (async) {line}')
+            except Exception as e:
+                print(f'[Reader Error] {e}')
+                break
 
     def send_command(self, command: str) -> str:
         if not command.endswith('\r\n'):
-            command += '\n'
+            command += '\r\n'
 
         with self.lock:
+            print(f'>>> {command.strip()}')
             self.serial.write(command.encode('ascii'))
 
-            response = self.serial.readline().decode(errors='ignore').strip()
+        # 等待来自读取线程的响应（可以设置超时）
+        try:
+            response = self.read_queue.get(timeout=2)
             return response
+        except queue.Empty:
+            print('[Warning] No response received in time')
+            return ''
 
-        return ''
-
-    def close():
+    def close(self):
+        self.running = False
+        if self.reader_thread.is_alive():
+            self.reader_thread.join(timeout=1)
         self.serial.close()
 
     def set_joint_location(self, radian_location):
         degree_location = [0.0] * 6
 
-        for i in range (0, 6):
-            # degree_location[i] = math.degrees(radian_location[i]) + (self.joint_dir[i] * self.zero_joint_angle[i])
-            degree_location[i] = self.zero_joint_angle[i] + (self.joint_dir[i] * math.degrees(radian_location[i]))
+        for i in range(6):
+            degree_location[i] = round(self.zero_joint_angle[i] + (self.joint_dir[i] * math.degrees(radian_location[i])), 2)
 
         cmd = self.command_helper.move_j(degree_location[0], 
                                          degree_location[1], 
                                          degree_location[2], 
                                          degree_location[3], 
                                          degree_location[4], 
-                                         degree_location[5],
-                                         100
-                                         )
-        print(f'>>> {cmd}')
-        ack = self.send_command(cmd)
-        print(f'<<< {ack}')
-
+                                         0,
+                                         100)
+        self.send_command(cmd)
+        # ack = self.send_command(self.command_helper.get_j_pose())
 
 class HardwareBridge(Node):
     def __init__(self):
@@ -158,6 +180,7 @@ class HardwareBridge(Node):
         #     self.get_logger().info("硬件控制器已连接")
         
         self.get_logger().info("通信节点已就绪，等待RVIZ执行命令...")
+        self.last_time = 0
 
     def joint_state_callback(self, msg):
         """更新当前关节状态"""
@@ -168,11 +191,12 @@ class HardwareBridge(Node):
                 idx = self.joint_names.index(name)
                 current_joint_positions[idx] = msg.position[i]
 
-        if current_joint_positions == self.current_joint_positions:
+        if current_joint_positions == self.current_joint_positions or time.time() - self.last_time <= 0.1:
             return
 
         self.current_joint_positions = current_joint_positions
         self.dummy_robot.set_joint_location(radian_location = self.current_joint_positions)
+        self.last_time = time.time()
 
     async def execute_callback(self, goal_handle):
         """处理来自MoveIt的执行请求"""
